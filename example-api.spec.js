@@ -123,7 +123,7 @@ test.describe('POST', () => {
     test('Create new user', async ({ request }) => {
         // Define test data
         const userData = {
-            name: "morpheus",
+            name: "Soju",
             job: "leader"
         };
 
@@ -157,7 +157,7 @@ test.describe('PUT', () => {
     test('Update user with PUT', async ({ request }) => {
         // Define test data
         const userData = {
-            name: "morpheus",
+            name: "Soju",
             job: "zion resident"
         };
 
