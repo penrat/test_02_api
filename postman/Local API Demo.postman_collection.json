@@ -1,0 +1,128 @@
+{
+  "info": {
+    "name": "Local API Demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Body has status ok', function () { pm.expect(pm.response.json().status).to.eql('ok'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Morpheus\",\n  \"job\": \"leader\"\n}"
+        },
+        "url": "{{baseUrl}}/users"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Created 201', function () { pm.response.to.have.status(201); });",
+              "const body = pm.response.json();",
+              "pm.environment.set('userId', body.id);",
+              "pm.test('Has id/name/job', function () { pm.expect(body).to.have.keys(['id','name','job','createdAt']); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get User (after POST)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('OK 200', function () { pm.response.to.have.status(200); });",
+          "pm.test('Has data.id', function () { pm.expect(pm.response.json().data.id).to.eql(parseInt(pm.environment.get('userId'))); });"
+        ] } }
+      ]
+    },
+    {
+      "name": "Put User",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Morpheus\",\n  \"job\": \"zion resident\"\n}" },
+        "url": "{{baseUrl}}/users/{{userId}}"
+      },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('OK 200', function () { pm.response.to.have.status(200); });"
+        ] } }
+      ]
+    },
+    {
+      "name": "Get User (after PUT)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('OK 200', function () { pm.response.to.have.status(200); });",
+          "pm.test('Job updated', function () { pm.expect(pm.response.json().data.job).to.eql('zion resident'); });"
+        ] } }
+      ]
+    },
+    {
+      "name": "Patch User",
+      "request": {
+        "method": "PATCH",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"job\": \"the One\"\n}" },
+        "url": "{{baseUrl}}/users/{{userId}}"
+      },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('OK 200', function () { pm.response.to.have.status(200); });"
+      ] } } ]
+    },
+    {
+      "name": "Get User (after PATCH)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('OK 200', function () { pm.response.to.have.status(200); });",
+        "pm.test('Job patched', function () { pm.expect(pm.response.json().data.job).to.eql('the One'); });"
+      ] } } ]
+    },
+    {
+      "name": "Delete User",
+      "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('No Content 204', function () { pm.response.to.have.status(204); });"
+      ] } } ]
+    },
+    {
+      "name": "Get User (after DELETE)",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/users/{{userId}}" },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('Not Found 404', function () { pm.response.to.have.status(404); });"
+      ] } } ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ]
+}
+
